@@ -19,9 +19,9 @@
     ```sh
     gcc -I/opt/homebrew/opt/gsl/include -L/opt/homebrew/opt/gsl/lib -lgsl -lgslcblas -lm generator/generator.c -o generator1
     ```
-- -I/opt/homebrew/opt/gsl/include tells the compiler where to find the GSL headers.
-- -L/opt/homebrew/opt/gsl/lib tells the linker where to find the GSL libraries.
-- -lgsl -lgslcblas -lm links the GSL and GSL CBLAS libraries as well as the math library.
+- `-I/opt/homebrew/opt/gsl/include` tells the compiler where to find the GSL headers.
+- `-L/opt/homebrew/opt/gsl/lib` tells the linker where to find the GSL libraries.
+- `-lgsl -lgslcblas -lm` links the GSL and GSL CBLAS libraries as well as the math library.
 
 4. Run the Go program:
     ```sh
