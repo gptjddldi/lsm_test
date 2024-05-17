@@ -45,3 +45,22 @@
 +----------------------------+
 Command execution time: 756.765708ms
 ```
+
+## 참고
+
+workload.txt 예시
+```text
+p -1109180 699692587
+p 1213834231 -226769626
+d 1213834231
+p 994957275 2082945813
+p -182635081 -1098200189
+d -182635081
+d 1213834231
+```
+
+`p`: put (2 arguments)
+`d`: delete (1 argument)
+`g`: get (1 argument)
+`r`: range (2 arguments)
+
