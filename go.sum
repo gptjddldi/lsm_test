@@ -1,0 +1,12 @@
+github.com/go-faker/faker/v4 v4.4.1 h1:LY1jDgjVkBZWIhATCt+gkl0x9i/7wC61gZx73GTFb+Q=
+github.com/go-faker/faker/v4 v4.4.1/go.mod h1:HRLrjis+tYsbFtIHufEPTAIzcZiRu0rS9EYl2Ccwme4=
+github.com/gptjddldi/lsm v0.0.0-20240512104230-349197567372/go.mod h1:k8vZZGYojAfPHwEraTyrfgloLWwaz+7Pd+ecCo/5lng=
+github.com/gptjddldi/lsm v0.0.1/go.mod h1:k8vZZGYojAfPHwEraTyrfgloLWwaz+7Pd+ecCo/5lng=
+github.com/gptjddldi/lsm v0.1.1 h1:FdYD3sYsZJLZcmFiXCleK9Tzzmg0j82qVNFtATUAbiA=
+github.com/gptjddldi/lsm v0.1.1/go.mod h1:k8vZZGYojAfPHwEraTyrfgloLWwaz+7Pd+ecCo/5lng=
+github.com/gptjddldi/lsm v0.1.2 h1:kcOhUet+zdhQI1ZibAJYXjQIKT98ECWG7BtsiuQBwx0=
+github.com/gptjddldi/lsm v0.1.2/go.mod h1:k8vZZGYojAfPHwEraTyrfgloLWwaz+7Pd+ecCo/5lng=
+github.com/gptjddldi/lsm v0.1.3 h1:ke70QVnPH8SFQmh1YrQ3L7L/TIxdS+or/jsbOwfDx2U=
+github.com/gptjddldi/lsm v0.1.3/go.mod h1:k8vZZGYojAfPHwEraTyrfgloLWwaz+7Pd+ecCo/5lng=
+golang.org/x/text v0.14.0 h1:ScX5w1eTa3QqT8oi6+ziP7dTV1S2+ALU0bI+0zXKWiQ=
+golang.org/x/text v0.14.0/go.mod h1:18ZOQIKpY8NJVqYksKHtTdi31H5itFRjB5/qKTNYzSU=

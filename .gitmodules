@@ -1,0 +1,3 @@
+[submodule "lsm-tree"]
+	path = lsm-tree
+	url = https://github.com/jackdent/cs265-lsm-tree.git
