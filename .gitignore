@@ -13,3 +13,7 @@ lsm-tree/*.a
 
 *.sst
 workload.txt
+
+test/bench-data/
+test/workload.txt
+test/bench-go-lsm_wal/
