@@ -25,7 +25,8 @@
 
 4. Run the Go program:
     ```sh
-    go run main.go
+   # /test
+    go test -bench-.
     ```
 
 ## 결과
@@ -35,15 +36,22 @@
 |        WORKLOAD INFO       |
 +----------------------------+
 | initial-seed: 13141
-| puts-total: 1000000
-| gets-total: 0
+| puts-total: 10000
+| gets-total: 1000
 | get-skewness: 0.0000
 | ranges: 0
 | range distribution: uniform
-| deletes: 20000
+| deletes: 0
 | gets-misses-ratio: 0.5000
 +----------------------------+
-Command execution time: 756.765708ms
+goos: darwin
+goarch: arm64
+pkg: main/test
+BenchmarkLSMTree-8      1000000000                   0.006580 ns/op
+BenchmarkPebble-8              1           28908898125 ns/op
+BenchmarkGoLSM-8        1000000000                   0.01551 ns/op
+PASS
+ok      main/test       29.502s
 ```
 
 ## 참고

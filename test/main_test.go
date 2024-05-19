@@ -16,11 +16,13 @@ import (
 )
 
 var (
-	once    sync.Once
-	db      *Lsm.DB
-	pbDB    *pebble.DB
-	goLsmDB *golsm.LSMTree
-	err     error
+	once_lsm    sync.Once
+	once_pb     sync.Once
+	once_go_lsm sync.Once
+	db          *Lsm.DB
+	pbDB        *pebble.DB
+	goLsmDB     *golsm.LSMTree
+	err         error
 )
 
 const lsmBenchFolder = "bench-lsm"
@@ -89,12 +91,11 @@ func TestMain(m *testing.M) {
 
 func initializeLsm() (*Lsm.DB, error) {
 	db, err = Lsm.Open(lsmBenchFolder)
-
 	return db, err
 }
 
 func BenchmarkLSMTree(b *testing.B) {
-	once.Do(func() {
+	once_lsm.Do(func() {
 		eraseBenchFolder(lsmBenchFolder)
 		db, err = initializeLsm()
 	})
@@ -158,12 +159,11 @@ func BenchmarkLSMTree(b *testing.B) {
 func initializePb() (*pebble.DB, error) {
 	eraseBenchFolder(pbBenchFolder)
 	pbDB, err := pebble.Open(pbBenchFolder, &pebble.Options{})
-
 	return pbDB, err
 }
 
 func BenchmarkPebble(b *testing.B) {
-	once.Do(func() {
+	once_pb.Do(func() {
 		pbDB, err = initializePb()
 	})
 	if err != nil {
@@ -218,7 +218,7 @@ func initializeGoLsm() (*golsm.LSMTree, error) {
 }
 
 func BenchmarkGoLSM(b *testing.B) {
-	once.Do(func() {
+	once_go_lsm.Do(func() {
 		eraseBenchFolder(goLsmBenchFolder)
 		goLsmDB, err = initializeGoLsm()
 	})
