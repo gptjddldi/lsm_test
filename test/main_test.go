@@ -11,10 +11,21 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"sync"
 	"testing"
 )
 
-const benchFolder = "bench-data"
+var (
+	once    sync.Once
+	db      *Lsm.DB
+	pbDB    *pebble.DB
+	goLsmDB *golsm.LSMTree
+	err     error
+)
+
+const lsmBenchFolder = "bench-lsm"
+const pbBenchFolder = "bench-pb"
+const goLsmBenchFolder = "bench-go-lsm"
 
 func init() {
 	log.SetOutput(io.Discard)
@@ -49,8 +60,8 @@ func runGenerator() error {
 	return os.Chmod("workload.txt", 0666)
 }
 
-func eraseBenchFolder() {
-	err := os.RemoveAll(benchFolder)
+func eraseBenchFolder(dir string) {
+	err := os.RemoveAll(dir)
 	if err != nil {
 		panic(err)
 	}
@@ -67,8 +78,6 @@ func openFile(err error) *os.File {
 }
 
 func TestMain(m *testing.M) {
-	eraseBenchFolder()
-
 	if err := runGenerator(); err != nil {
 		fmt.Fprintf(os.Stderr, "Error running generator: %v\n", err)
 		os.Exit(1)
@@ -78,8 +87,17 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
+func initializeLsm() (*Lsm.DB, error) {
+	db, err = Lsm.Open(lsmBenchFolder)
+
+	return db, err
+}
+
 func BenchmarkLSMTree(b *testing.B) {
-	db, err := Lsm.Open(benchFolder)
+	once.Do(func() {
+		eraseBenchFolder(lsmBenchFolder)
+		db, err = initializeLsm()
+	})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -127,19 +145,29 @@ func BenchmarkLSMTree(b *testing.B) {
 			key := []byte(parts[1])
 			db.Delete(key)
 		default:
-			fmt.Fprintf(os.Stderr, "Unknown command: %s\n", command)
+			b.Fatal("Unknown command")
 		}
 	}
 
 	if err := scanner.Err(); err != nil {
-		fmt.Fprintf(os.Stderr, "Error reading file: %v\n", err)
+		b.Fatal(err)
 	}
+	eraseBenchFolder(lsmBenchFolder)
+}
+
+func initializePb() (*pebble.DB, error) {
+	eraseBenchFolder(pbBenchFolder)
+	pbDB, err := pebble.Open(pbBenchFolder, &pebble.Options{})
+
+	return pbDB, err
 }
 
 func BenchmarkPebble(b *testing.B) {
-	db, err := pebble.Open(benchFolder, &pebble.Options{})
+	once.Do(func() {
+		pbDB, err = initializePb()
+	})
 	if err != nil {
-		log.Fatal(err)
+		b.Fatal(err)
 	}
 
 	file := openFile(err)
@@ -158,10 +186,10 @@ func BenchmarkPebble(b *testing.B) {
 		case "p":
 			key := []byte(parts[1])
 			value := []byte(parts[2])
-			db.Set(key, value, pebble.Sync)
+			pbDB.Set(key, value, pebble.Sync)
 		case "g":
 			key := []byte(parts[1])
-			_, _, err := db.Get(key)
+			_, _, err := pbDB.Get(key)
 			if err != nil {
 				continue
 			}
@@ -174,21 +202,28 @@ func BenchmarkPebble(b *testing.B) {
 		//	db.Range(start, end)
 		case "d":
 			key := []byte(parts[1])
-			db.Delete(key, pebble.Sync)
+			pbDB.Delete(key, pebble.Sync)
 		default:
-			fmt.Fprintf(os.Stderr, "Unknown command: %s\n", command)
+			b.Fatal("Unknown command")
 		}
 	}
 
 	if err := scanner.Err(); err != nil {
-		fmt.Fprintf(os.Stderr, "Error reading file: %v\n", err)
+		b.Fatal(err)
 	}
 }
 
+func initializeGoLsm() (*golsm.LSMTree, error) {
+	return golsm.Open(goLsmBenchFolder, 640_000_000, false)
+}
+
 func BenchmarkGoLSM(b *testing.B) {
-	db, err := golsm.Open("bench-go-lsm", 64_000_000, true)
+	once.Do(func() {
+		eraseBenchFolder(goLsmBenchFolder)
+		goLsmDB, err = initializeGoLsm()
+	})
 	if err != nil {
-		log.Fatal(err)
+		b.Fatal(err)
 	}
 
 	file := openFile(err)
@@ -210,16 +245,16 @@ func BenchmarkGoLSM(b *testing.B) {
 			}
 			key := parts[1]
 			value := []byte(parts[2])
-			err := db.Put(key, value)
+			err := goLsmDB.Put(key, value)
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "Error inserting key: %v\n", err)
+				b.Fatal(err)
 			}
 		case "g":
 			if len(parts) != 2 {
 				continue
 			}
 			key := parts[1]
-			_, err := db.Get(key)
+			_, err := goLsmDB.Get(key)
 			if err != nil {
 				continue
 			}
@@ -235,18 +270,18 @@ func BenchmarkGoLSM(b *testing.B) {
 				continue
 			}
 			key := parts[1]
-			err := db.Delete(key)
+			err := goLsmDB.Delete(key)
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "Error deleting key: %v\n", err)
+				b.Fatal(err)
 			}
 		default:
-			fmt.Fprintf(os.Stderr, "Unknown command: %s\n", command)
+			b.Fatal("Unknown command")
 		}
 	}
 
 	if err := scanner.Err(); err != nil {
-		fmt.Fprintf(os.Stderr, "Error reading file: %v\n", err)
+		b.Fatal(err)
 	}
-	os.Remove("bench-go-lsm")
-	os.Remove("bench-go-lsm_wal")
+	os.RemoveAll("bench-go-lsm")
+	os.RemoveAll("bench-go-lsm_wal")
 }
